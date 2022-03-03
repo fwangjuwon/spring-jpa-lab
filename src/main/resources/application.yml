@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: utf-8
+
+#hibernate는 SQL 을 직접 사용하지 않고 메소드만으로 쿼리를 사용해주게 하는 라이브러리이다. 
+#hibernate 기술을 쉽게 사용하게 해주는 라이브러리가 JPA이다. 
+#hibernate 범주가 jpa보다 크다. 
+#ddl-auto: create는 서버 실행할 때마다 테이블을 삭제하고 새로 만드는 설정이다. 
+#ddl-auto: none은 서버 실행할 때마다 아무것도 하지 않는 옵션이다.
+#ddl-auto: update는  필드 수정 시에 필요한 옵션이다 (필드 삭제하려면 db에서 직접 하세요)
+
+spring:
+  datasource:
+      url: jdbc:mariadb://localhost:3306/greendb
+      driver-class-name: org.mariadb.jdbc.Driver
+      username: green
+      password: green1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true 
+
+
+  output:
+    ansi:
+      enabled: always
