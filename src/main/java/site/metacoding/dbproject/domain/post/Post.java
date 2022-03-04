@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,9 +12,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import site.metacoding.dbproject.domain.user.User;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id // 얘를프라이머리키로 만들어 준다.
@@ -31,5 +43,10 @@ public class Post {
     @ManyToOne // n:1 에서 n에 포린키 post:user = n:1
     private User user;
 
+    @CreatedDate // insert
     private LocalDateTime createDate;
+
+    @LastModifiedDate // insert, update
+    private LocalDateTime updateDate;
+
 }

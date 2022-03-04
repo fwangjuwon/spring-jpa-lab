@@ -4,14 +4,20 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.UniqueConstraint;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.web.servlet.FlashMapManager;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,8 +28,9 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
 @Entity // server실행 시 해당 클래스로 db 테이블을 생성해! 라고 하는 어노테이션
+@EntityListeners(AuditingEntityListener.class) // 현재 시간 입력을 위해 필요한 어노테이션
 public class User {
 
     // identity 전략은 db에게 번호증가 전략을 위임하는 것이다. -> 알아서 db에 맞게 찾아준다.
@@ -40,5 +47,9 @@ public class User {
     @Column(length = 16000000)
     private String email;
 
+    @CreatedDate // insert
     private LocalDateTime createDate;
+
+    @LastModifiedDate // insert, update
+    private LocalDateTime updateDate;
 }
