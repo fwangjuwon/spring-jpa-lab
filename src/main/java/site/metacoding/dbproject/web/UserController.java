@@ -2,10 +2,11 @@ package site.metacoding.dbproject.web;
 
 import java.util.Optional;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,7 +67,16 @@ public class UserController {
 
     // 로그인 페이지 (정적) - 인증(로그인) X
     @GetMapping("/loginForm")
-    public String loginForm() {
+    public String loginForm(HttpServletRequest request, Model model) {
+        // jsessionid=fijweofiwjeojwimekrw;remember=ssar
+        // request.getHeader("Cookie");
+        Cookie[] cookies = request.getCookies(); // JSessionID, remember 두개가 있음
+        for (Cookie cookie : cookies) {
+            System.out.println("쿠키값: " + cookie.getName());
+            if (cookie.getName().equals("remembeer")) {
+                model.addAttribute("remember", cookie.getValue());
+            }
+        }
         return "user/loginForm";
     }
 
@@ -77,7 +87,7 @@ public class UserController {
     // 이유 : 주소에 패스워드를 남길 수 없으니까!! 보안을 위해!!
     // 로그인 - 인증(로그인) X
     @PostMapping("/login")
-    public String login(HttpServletRequest request, User user) {
+    public String login(HttpServletResponse response, User user) {
         // HttpSession session = request.getSession(); // 쿠키에 JSESSIONID를 85로 가져오면
         // session의 자기 공간을 가리킴
 
@@ -91,8 +101,11 @@ public class UserController {
             System.out.println("로그인 되었습니다.");
             // 세션에 옮겨담자, request는 사라졌지만 세션영역에 보관
             session.setAttribute("principal", userEntity); // principal 인증된 주체 -> 로그인
-        }
 
+            if (user.getRemember().equals("on")) {
+                response.setHeader("Set-Cookie", "remember=" + userEntity.getUsername());
+            }
+        }
         return "redirect:/";
     }
 
