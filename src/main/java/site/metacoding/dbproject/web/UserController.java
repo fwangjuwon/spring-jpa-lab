@@ -39,7 +39,25 @@ public class UserController {
     // 회원가입 INSERT - 인증(로그인) X
     @PostMapping("/join")
     public String join(User user) { // 행위, 페이지 아님
-        System.out.println("user : " + user);
+        // 1. username, password, email check -> choin form 에서 던진다. 문제!!서버 실행해보면 패스워드
+        // 안넣어도 회원가입이 돼버림
+        // -> 프론트에서 먼저 막아야한다. -일반인 (required 속성 걸기)
+        // -> 백엔드에서 막기 - 공격자(body로 넘어온 값을 확인: null check, 공백 check, @없는거 체크, 비밀번호 길이
+        // 체크,비번이 한글인지,,,,) -> null과 공백만 체크!!
+        // username=ssar&password=&email=ssar@nate.com 패스워드 공백
+        // username=ssar&email=ssar passwordnull
+        // user.getpassword==null
+
+        // 1. username, password, email -> null check, 공백 check
+        // try-catch로 잡는다. if로 하면 최악이다 하나하나 다해야되
+        if (user.getUsername() == null || user.getPassword() == null || user.getEmail() == null) {
+            return "redirect:/joinForm"; // 문제! 새로고침됨
+        }
+        if (user.getUsername().equals("") || user.getPassword().equals("") || user.getEmail().equals("")) {
+            return "redirect:/joinForm";
+        }
+
+        // 2. 핵심 로직
         User userEntity = userRepository.save(user);
         System.out.println("userEntity : " + userEntity);
         // redirect는 GetMapping 주소!! redirect:매핑주소
