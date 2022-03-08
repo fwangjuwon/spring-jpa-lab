@@ -1,5 +1,7 @@
 package site.metacoding.dbproject.web;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -41,7 +43,7 @@ public class PostController {
         // 1. post repository의 findAll()호출
 
         // 2. 모델에 담기
-
+        model.addAttribute("posts", postRepository.findAll());
         // 3. 머스태치로 뿌리면 됨
 
         return "post/list";
