@@ -1,8 +1,10 @@
-{{>/layout/header}}
+{{> /layout/header}}
+
 <!-- 컨테이너 시작 -->
 <div class="container mt-3">
 
-    <!-- 회원 상세정보보기 폼 시작 -->
+    <!-- 상세정보보기 시작 -->
+
     <div class="mb-3 mt-3">
         {{user.username}}
     </div>
@@ -12,10 +14,11 @@
     <div class="mb-3">
         {{user.email}}
     </div>
-    <a href="/user/updateForm" class="btn btn-primary">정보수정</a>
-    
-    <!-- 회원 상세정보보기 폼 끝 -->
+    <a href="/user/updateForm" class="btn btn-dark">수정 페이지이동</a>
+
+    <!-- 상세정보보기 끝 -->
 
 </div>
 <!-- 컨테이너 끝 -->
-{{>/layout/footer}}
+
+{{> /layout/footer}}
