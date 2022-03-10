@@ -61,7 +61,7 @@ public class PostController {
             return "post/detail";
         } else {
             return "error/page1";
-        }
+        } // try-catch로 하는게 더 좋다.
     }
 
     // 글 수정 페이지 /post/{id}/updateForm 인증필요o
