@@ -20,19 +20,10 @@
       {{/posts.content}}
       <!-- 게시글 아이템 끝 -->
 
-      {{#posts.first}}
       <ul class="pagination justify-content-center"> 
-        <li class="page-item disabled" ><a class="page-link" href="?page={{prevPage}}"> 이전 </a></li>
-        <li class="page-item"><a class="page-link" href="?page={{nextPage}}">다음</a></li>
-      </ul>
-      {{/posts.first}}
-      
-   {{^posts.first}}
-   <ul class="pagination justify-content-center"> 
-   <li class="page-item" ><a class="page-link" href="?page={{prevPage}}"> 이전 </a></li>
-   <li class="page-item"><a class="page-link" href="?page={{nextPage}}">다음</a></li>
- </ul>
- {{/posts.first}}
+          <li class="page-item {{#posts.first}} disabled {{/posts.first}}"><a class="page-link" href="?page={{prevPage}}">이전</a></li>
+          <li class="page-item {{#posts.last}} disabled {{/posts.last}}"><a class="page-link" href="?page={{nextPage}}">다음</a></li>
+        </ul>
 
 </div>
 <!-- 컨테이너 끝 -->

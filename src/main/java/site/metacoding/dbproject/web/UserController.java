@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import site.metacoding.dbproject.domain.user.User;
 import site.metacoding.dbproject.domain.user.UserRepository;
+import site.metacoding.dbproject.web.dto.ResponseDto;
 
 @Controller
 public class UserController {
@@ -29,6 +30,23 @@ public class UserController {
     public UserController(UserRepository userRepository, HttpSession session) {
         this.userRepository = userRepository;
         this.session = session;
+    }
+
+    // http://localhost:8080/api/user/username/same-check?username=s
+    // user의 username이 동일한지 줄래??? - 응답(json)
+    @GetMapping("/api/user/username/same-check") // api붙어있으면 데이터 주는 컨트롤러구나!! 판단한다 //예외적으로 동사허용!
+    public @ResponseBody ResponseDto<String> sameCheck(String username) {
+        // 1. select * from user where username ="ssar";
+        User userEntity = userRepository.mUsernameSameCehck(username);
+        // 2. 있으면? 없으면?
+        if (userEntity == null) {
+            return new ResponseDto<String>(1, "통신성공", "없어");
+        } // 1이면 진행하고 1아니면 진행 안함->자바스크립트 처리 -> 중복체크 -> alert처리 해서 아이디 사용
+          // 못하게 해 > fetch로 요청해서 input다 날려버리기
+        else {
+            return new ResponseDto<String>(1, "통신성공", "있어");
+        }
+
     }
 
     // 회원가입 페이지 (정적) - 로그인X
