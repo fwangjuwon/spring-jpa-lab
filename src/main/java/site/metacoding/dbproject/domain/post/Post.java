@@ -31,6 +31,7 @@ public class Post {
 
     @Id // 얘를프라이머리키로 만들어 준다.
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer id; // primary key
 
     @Column(length = 300, nullable = false)

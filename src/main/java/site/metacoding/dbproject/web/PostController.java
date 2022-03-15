@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,7 +44,7 @@ public class PostController {
         // 1. post repository의 findAll()호출
 
         // 2. 모델에 담기
-        model.addAttribute("posts", postRepository.findAll());
+        model.addAttribute("posts", postRepository.findAll(Sort.by(Sort.Direction.DESC, "id")));
         // 3. 머스태치로 뿌리면 됨
 
         return "post/list";
