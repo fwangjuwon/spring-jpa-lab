@@ -48,7 +48,19 @@ public class UserService {
     }
 
     @Transactional
-    public void 유저수정() {
+    public User 유저수정(Integer id, User user) {
+        // 1. 영속화 -> dirty checking
+        Optional<User> userOp = userRepository.findById(id); // 영속화 됨
 
-    }
+        if (userOp.isPresent()) {
+            // 영속화 된 것
+            User userEntity = userOp.get();
+            userEntity.setPassword(user.getPassword());
+            userEntity.setEmail(user.getEmail());
+            return userEntity;
+        } else {
+            return null;
+            // 영속화 안 되면 아무것도 안한다.
+        }
+    } // 트랜잭션 종료 + 영속화 되어 있는 것들 전부 더티체킹!(변경감지해서 디비에 flush) -> update
 }

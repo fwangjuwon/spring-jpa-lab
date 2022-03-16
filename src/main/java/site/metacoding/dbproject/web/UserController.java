@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
@@ -151,9 +152,34 @@ public class UserController {
         return "user/updateForm";
     }
 
-    // 유저수정 - 로그인O
+    // username(x),password(0),email(0)
+    // password=1234&email=ssar@nate.com(x-www-form)
+    // {"password":"1234","email":"ssar@nate.com"} (application/json)
+    // json을 받을 것이기 때문에 spring이 데이터 받을 때 파싱 전략을 변경해줘야한다. -> @requestbody 붙이면 파싱전략이
+    // 바뀐다. -> x-www- form 이 json으로 바껴서 파싱되어서 던져준다.
+    // put요청은 http body가 있다. http header의 content type에 mime타입을 알려줘야한다.
+
+    // @requestbody -> bufferedreader + json 파싱
+    // @responsebody -> bufferedwriter + json 파싱
+
     @PutMapping("/s/user/{id}")
-    public String update(@PathVariable Integer id) {
-        return "redirect:/user/" + id;
+    public @ResponseBody ResponseDto<String> update(@PathVariable Integer id, @RequestBody User user) {
+
+        User principal = (User) session.getAttribute("principal");
+
+        // 1. 인증 체크
+        if (principal == null) {
+            return new ResponseDto<String>(-1, "인증안됨", null);
+        }
+
+        // 2. 권한체크
+        if (principal.getId() != id) {
+            return new ResponseDto<String>(-1, "권한없음", null);
+        }
+
+        User userEntity = userService.유저수정(id, user);
+        session.setAttribute("principal", userEntity); // session변경 - 덮어쓰기
+
+        return new ResponseDto<String>(1, "성공", null);
     }
 }
