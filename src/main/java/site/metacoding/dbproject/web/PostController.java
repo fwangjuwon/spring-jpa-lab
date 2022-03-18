@@ -64,11 +64,13 @@ public class PostController {
             return "error/page1";
         }
 
-        // 권한 확인해서 뷰로 값 넘김
-        if (principal.getId() == postEntity.getUser().getId()) { // 권한이 있다는 뜻
-            model.addAttribute("pageOwner", true);
-        } else {
-            model.addAttribute("pageOwner", false);
+        if (principal != null) {
+            // 권한 확인해서 뷰로 값 넘김
+            if (principal.getId() == postEntity.getUser().getId()) { // 권한이 있다는 뜻
+                model.addAttribute("pageOwner", true);
+            } else {
+                model.addAttribute("pageOwner", false);
+            }
         }
 
         if (postEntity == null) {
