@@ -70,9 +70,14 @@ public class PostController {
             if (principal.getId() == postEntity.getUser().getId()) { // 권한 있음
                 model.addAttribute("pageOwner", true);
             } else {
-                model.addAttribute("pagrOwner", false);
+                model.addAttribute("pageOwner", false);
             }
         }
+
+        String rawContent = postEntity.getContent();
+        String encContent = rawContent.replaceAll("<", "&lt;").replaceAll(">",
+                "&gt");
+        postEntity.setContent(encContent);
 
         model.addAttribute("post", postEntity);
         return "post/detail";
