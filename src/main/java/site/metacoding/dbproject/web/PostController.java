@@ -18,60 +18,58 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import site.metacoding.dbproject.domain.post.Post;
-import site.metacoding.dbproject.domain.post.PostRepository;
 import site.metacoding.dbproject.domain.user.User;
 import site.metacoding.dbproject.service.PostService;
+import site.metacoding.dbproject.web.dto.ResponseDto;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor // final이 붙은 애들에 대한 생성자를 만들어준다.
 @Controller
 public class PostController {
 
     private final HttpSession session;
     private final PostService postService;
-    private final PostRepository postRepository; // 나중에 지워야함
 
-    // 글쓰기 페이지 /post/writeForm- 인증 필요o, 권한 필요x
+    // GET 글쓰기 페이지 /post/writeForm - 인증 O
     @GetMapping("/s/post/writeForm")
     public String writeForm() {
-        // 인증 체크
         if (session.getAttribute("principal") == null) {
             return "redirect:/loginForm";
         }
-        return "post/writeForm"; // viewresolver도움 받음
+        return "post/writeForm";
     }
 
-    // 이사!!
-    // main 페이지 - 인증 필요x
-    // 글 목록 페이지 /post/list, /
     @GetMapping({ "/", "/post/list" })
     public String list(@RequestParam(defaultValue = "0") Integer page, Model model) {
 
         Page<Post> pagePosts = postService.글목록보기(page);
 
         model.addAttribute("posts", pagePosts);
-        model.addAttribute("nextPage", page + 1);
         model.addAttribute("prevPage", page - 1);
-
-        // 3. 머스태치로 뿌리면 됨
+        model.addAttribute("nextPage", page + 1);
 
         return "post/list";
     }
 
-    // @GetMapping("/test/post/list")
-    // public @ResponseBody Page<Post> listTest(@RequestParam(defaultValue = "0")
-    // Integer page) {
-    // PageRequest pq = PageRequest.of(page, 3);
-    // return postRepository.findAll(pq);
-    // }
-
     // 이사!!
-    // 글 상세보기 페이지 /post/{id} (삭제버튼 -> 글목록으로 돌아오기 , 수정버튼->수정페이지 만들어 두기) 인증 필요x
-    @GetMapping("/post/{id}") // get요청에 /post 만 제외 시키기 !! get은 일단 무사통과 시켜 !
+    // GET 글상세보기 페이지 /post/{id} (삭제버튼 만들어 두면됨, 수정버튼 만들어 두면됨) - 인증 X
+    @GetMapping("/post/{id}") // Get요청에 /post 제외 시키기
     public String detail(@PathVariable Integer id, Model model) {
+
+        User principal = (User) session.getAttribute("principal");
 
         Post postEntity = postService.글상세보기(id);
 
-        Optional<Post> postOp = postRepository.findById(id);
+        // 게시물이 없으면 error페이지 이동
+        if (postEntity == null) {
+            return "error/page1";
+        }
+
+        // 권한 확인해서 뷰로 값 넘김
+        if (principal.getId() == postEntity.getUser().getId()) { // 권한이 있다는 뜻
+            model.addAttribute("pageOwner", true);
+        } else {
+            model.addAttribute("pageOwner", false);
+        }
 
         if (postEntity == null) {
             return "error/page1";
@@ -79,40 +77,56 @@ public class PostController {
             model.addAttribute("post", postEntity);
             return "post/detail";
         }
+
     }
 
-    // 글 수정 페이지 /post/{id}/updateForm 인증필요o
+    // GET 글수정 페이지 /post/{id}/updateForm - 인증 O
     @GetMapping("/s/post/{id}/updateForm")
-    public String updateForm(@PathVariable int id) {
-        return "post/updateForm";
+    public String updateForm(@PathVariable Integer id) {
+        return "post/updateForm"; // ViewResolver 도움 받음.
     }
 
-    // delete 글 삭제 /post/{id} -> 글 목록 페이지로 인증필요o
+    // DELETE 글삭제 /post/{id} - 글목록으로 가기 - 인증 O
     @DeleteMapping("/s/post/{id}")
-    public String delete(@PathVariable Integer id) {
-        return "redirect:/";
+    public @ResponseBody ResponseDto<String> delete(@PathVariable Integer id) {
+
+        User principal = (User) session.getAttribute("principal");
+
+        if (principal == null) { // 로그인이 안됐다는 뜻
+            return new ResponseDto<String>(-1, "로그인이 되지 않았습니다", null);
+        }
+
+        Post postEntity = postService.글상세보기(id);
+
+        if (principal.getId() != postEntity.getUser().getId()) { // 권한이 없다는 뜻
+            return new ResponseDto<String>(-1, "해당 글을 삭제할 권한이 없습니다.", null);
+        }
+
+        postService.글삭제하기(id); // 내부적으로 exception이 터지면 무조건 스택 트레이스를 리턴한다.
+
+        return new ResponseDto<String>(1, "성공", null);
     }
 
-    // update 글 수정 /post/{id} -> 글상세보기 페이지 인증필요o
+    // UPDATE 글수정 /post/{id} - 글상세보기 페이지가기 - 인증 O
     @PutMapping("/s/post/{id}")
     public String update(@PathVariable Integer id) {
         return "redirect:/post/" + id;
     }
 
-    // 이사!
-    // post글 쓰기 /post -> 글목록 페이지로 인증필요o
+    // 이사!!
+    // POST 글쓰기 /post - 글목록으로 가기 - 인증 O
     @PostMapping("/s/post")
     public String write(Post post) {
 
-        // title, content 1.null검사, 2. 공백 검사, 3. 길이 검사 ....
+        // title, content 1. null검사, 2.공백검사, 3.길이검사 .........
 
-        // 인증 체크
         if (session.getAttribute("principal") == null) {
             return "redirect:/loginForm";
         }
 
         User principal = (User) session.getAttribute("principal");
         postService.글쓰기(post, principal);
-        return "redirect:/"; // redirect: 다른 페이지로 이동시켜준다.
+
+        return "redirect:/";
     }
 }

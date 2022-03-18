@@ -43,8 +43,8 @@ public class PostService {
     }
 
     @Transactional // select하는거는 필요 없고 write하는 거만 필요하다.
-    public void 글삭제하기() {
-
+    public void 글삭제하기(Integer id) {
+        postRepository.deleteById(id); // 내부적으로 exception이 터짐
     }
 
     @Transactional // 어떤 예외가 걸렸을 때 롤백할건지는 괄호 안에 넣으면 된다.
