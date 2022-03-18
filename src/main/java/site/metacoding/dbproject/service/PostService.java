@@ -21,12 +21,10 @@ public class PostService {
     public Page<Post> 글목록보기(Integer page) {
         PageRequest pq = PageRequest.of(page, 3);
         return postRepository.findAll(pq);
-
     }
 
-    // 글 상세보기, 글 수정페이지
+    // 글상세보기, 글수정페이지
     public Post 글상세보기(Integer id) {
-
         Optional<Post> postOp = postRepository.findById(id);
 
         if (postOp.isPresent()) {
@@ -34,23 +32,29 @@ public class PostService {
             return postEntity;
         } else {
             return null;
-        } // try-catch로 하는게 더 좋다.
+        }
     }
 
-    @Transactional // 이거 걸리면 끝날 때 커밋된다. 하나의 트랜잭션이 끝날 때
-    public void 글수정하기() {
+    @Transactional
+    public void 글수정하기(Post post, Integer id) {
+        Optional<Post> postOp = postRepository.findById(id);
 
-    }
+        if (postOp.isPresent()) {
+            Post postEntity = postOp.get();
+            postEntity.setTitle(post.getTitle());
+            postEntity.setContent(post.getContent());
+        }
+    } // 더티체킹 완료 (수정됨)
 
-    @Transactional // select하는거는 필요 없고 write하는 거만 필요하다.
+    @Transactional
     public void 글삭제하기(Integer id) {
-        postRepository.deleteById(id); // 내부적으로 exception이 터짐
+        postRepository.deleteById(id); // 실패했을 때 내부적으로 exception 터짐
     }
 
-    @Transactional // 어떤 예외가 걸렸을 때 롤백할건지는 괄호 안에 넣으면 된다.
+    @Transactional
     public void 글쓰기(Post post, User principal) {
-
-        post.setUser(principal); // user forieng key 추가
+        post.setUser(principal); // User FK 추가!!
         postRepository.save(post);
     }
+
 }
